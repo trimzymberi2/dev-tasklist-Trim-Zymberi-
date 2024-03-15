@@ -42,21 +42,26 @@ app.post('/api/bookings', async (req, res) => {
   }
 });
 
-//API endpoint to fetch a booking by id
+
 
 app.get('/api/bookings/:id', async (req, res) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id, 10); 
+
+    if (isNaN(id)) {
+      res.status(400).json({ error: 'Invalid booking ID' });
+      return;
+    }
 
   try {
     const [rows] = await pool.query('SELECT * FROM bookings WHERE id = ?', [id]);
     if (rows.length === 0) {
-      res.status(404).json({ error: 'Booking not found' }); // Handle case where no booking is found
+      res.status(404).json({ error: 'Booking not found' }); 
     } else {
-      res.status(200).json({ data: rows[0] }); // Return the first row (assuming ID is unique)
+      res.status(200).json({ data: rows[0] }); 
     }
   } catch (error) {
     console.error('Error fetching booking:', error);
-    res.status(500).json({ error: 'Internal Server Error' }); // Standardized error response
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
